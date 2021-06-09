@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+      integrity="sha512-PgQMlq+nqFLV4ylk1gwUOgm6CtIIXkKwaIHp/PAIWHzig/lKZSEGKEysh0TCVbHJXCLN7WetD8TFecIky75ZfQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap"
+      rel="stylesheet"
+    />
+    <!-- <link rel="stylesheet" href="index.css"> -->
+    <title>Weather App</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: "Quicksand", sans-serif;
+      }
+
+      body {
+        height: 100vh;
+        width: 100vw;
+        background-color: #f3f2ef;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: nowrap;
+      }
+
+      .box {
+        width: 20vw;
+        height: 60vh;
+        min-width: 20rem;
+        min-height: 35rem;
+        background-color: #a5bbdd;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.2rem 3rem rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+        /* transform: translate3d(0,0,0); */
+      }
+
+      .wave {
+        opacity: 0.3;
+        position: absolute;
+        top: 120%;
+        left: 50%;
+        background-color: white;
+        width: 50rem;
+        height: 50rem;
+        margin-top: -25rem;
+        margin-left: -25rem;
+        border-radius: 43%;
+        transform-origin: 50% 48%;
+        animation: drift 5000ms infinite linear;
+        z-index: 1;
+      }
+
+      .three {
+        animation: drift 7000ms infinite linear;
+        z-index: 2 !important;
+        opacity: 0.2;
+      }
+
+      .two {
+        animation: drift 9000ms infinite linear;
+        z-index: 3 !important;
+        opacity: 0.1;
+      }
+
+      @keyframes drift {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .weathercon {
+        height: 55%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .weathercon > .fas {
+        margin-top: -40px;
+        font-size: 5rem;
+        animation: fas 3s linear infinite alternate;
+      }
+
+      @keyframes fas {
+        0% {
+          transform: scale(0.9);
+        }
+        100% {
+          transform: scale(1.3);
+        }
+      }
+
+      .info {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 45%;
+        z-index: 5;
+        text-align: center;
+      }
+
+      .location {
+        margin-top: 15px;
+        font-size: 35px;
+        font-weight: 700;
+      }
+
+      .location > i {
+        margin-right: 6px;
+      }
+
+      .fa-street-view {
+        animation: rot 3s linear infinite alternate;
+      }
+
+      @keyframes rot {
+        0% {
+          transform: translateX(-0.5rem);
+        }
+        100% {
+          transform: translateX(0.5rem);
+        }
+      }
+
+      .date,
+      .temp_minmax {
+        margin-top: 10px;
+        font-size: 17px;
+      }
+
+      .temp {
+        margin-top: 30px;
+        font-size: 40px;
+        font-weight: 900;
+      }
+
+      .fa-sun {
+        color: #eccc68;
+      }
+
+      .fa-sun:before {
+        content: "\f185";
+      }
+
+      .fa-clouds {
+        color: #dcdde1;
+      }
+
+      .fa-clouds:before {
+        content: "\f0c2";
+      }
+
+      .fa-cloud-rain {
+        color: #34495e;
+      }
+
+      .fa-cloud-rain:before {
+        content: "\f73d";
+      }
+
+      select,
+      option {
+        border: none;
+        background: none;
+        color: black;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body onload="getday(); setInterval('getday()',1000)">
+    <!-- api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key} -->
+    <!-- api.openweathermap.org/data/2.5/weather?q=Surat&units=metric&appid=7bc2cda0fa50d0b20ffe2ef0d2426e4a -->
+
+    <div class="box">
+      <div class="wave one"></div>
+      <div class="wave two"></div>
+      <div class="wave three"></div>
+
+      <!-- <select name="select" id="select">
+        <option value="Surat">Surat</option>
+        <option value="Pune">Pune</option>
+      </select> -->
+      <div class="weathercon" id="weathercon"></div>
+
+      <div class="info">
+        <h2 class="location">
+          <i class="fas fa-street-view"></i>
+          {%location%}, {%country%}
+        </h2>
+        <p class="date" id="datedate">wed | o00ct 22 | 11:00 Am</p>
+        <h1 class="temp">{%temp%}&deg;C</h1>
+        <h3 class="temp_minmax">Min {%min%}&deg;C | Max {%max%}&deg;C</h3>
+      </div>
+    </div>
+  </body>
+  <!-- <script src="index.js"></script> -->
+  <script>
+    // console.log("jay swaminarayan")
+
+    let newdate = document.getElementById("datedate");
+    let newweathercon = document.getElementById("weathercon");
+
+    const currentWeather = "{%weatherStatus%}";
+
+    if (currentWeather == "Sunny") {
+      newweathercon.innerHTML = `<i class="fas fa-sun"></i>`;
+    } else if (currentWeather == "Clouds") {
+      newweathercon.innerHTML = `<i class="fas fa-clouds"></i>`;
+    } else if (currentWeather == "Rainy") {
+      newweathercon.innerHTML = `<i class="fas fa-cloud-rain"></i>`;
+    } else {
+      newweathercon.innerHTML = `<i class="fas fa-sun"></i>`;
+    }
+
+    function getday() {
+      let h = new Date();
+
+      let day = h.getDay();
+      let weekday = new Array(7);
+      weekday[0] = "Sun";
+      weekday[1] = "Mon";
+      weekday[2] = "Tue";
+      weekday[3] = "Wed";
+      weekday[4] = "Thu";
+      weekday[5] = "Fri";
+      weekday[6] = "Sat";
+
+      let month = h.getMonth();
+      let monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+
+      let date = h.getDate();
+
+      let ampm;
+      let hr = h.getHours();
+      let min = h.getMinutes();
+      let sec = h.getSeconds();
+
+      if (hr < 12) {
+        ampm = "AM";
+      } else {
+        ampm = "PM";
+      }
+      if (hr > 12) {
+        hr = hr - 12;
+      }
+      if (min < 10) {
+        min = "0" + min;
+      }
+      if (sec < 10) {
+        sec = "0" + sec;
+      }
+
+      let ans = `${weekday[day]} | ${monthNames[month]} ${date} | ${hr}:${min}:${sec} ${ampm}`;
+      newdate.innerHTML = ans;
+    }
+  </script>
+</html>
